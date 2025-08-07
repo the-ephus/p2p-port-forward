@@ -71,10 +71,10 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Do
 
 1. Check the live output in your terminal:
    
-    ```tail -f /var/log/natpmp_forward.log```
+    ```tail -f /var/log/natpmp_forward.log
 
 2. You should see a confirmation message, for example:
    
-    ```VPN port mapped successfully: 54321 to 6881```
+    ```VPN port mapped successfully: 54321 to 6881
 
 3. Within 5 minutes, your torrent client should acknowledged a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
