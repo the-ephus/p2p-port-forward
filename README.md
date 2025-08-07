@@ -7,11 +7,9 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Do
 
 ## Features
 
-- Automatically maps public VPN ports to your torrent client's listening port
+- Automatically maps rotating VPN P2P ports to your torrent client's listening port
 - Uses NAT-PMP (with `natpmpc`) to request forwarded ports from your VPN provider
-- Avoids unRAID flash drive writes by logging to RAM
 - Installs `libnatpmp` inside your container if missing
-- Built-in log rotation to limit RAM usage
 - Minimal configuration required
 
 ---
@@ -21,7 +19,7 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Do
 - **ProtonVPN - paid plan** (or another VPN with NAT-PMP and dynamic port support)
 - **Torrent Docker container** (e.g. `linuxserver/qbittorrent`)
 - **User Scripts plugin** in unRAID
-- unRAID 6.12+ recommended (for built-in WireGuard support)
+- unRAID 6.12+ (for built-in WireGuard support)
 
 ---
 
@@ -40,22 +38,22 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Do
 1. Go to **Settings > VPN Manager** in unRAID.
 2. Click **Import Tunnel** and upload your `.conf`.
 3. In **Advanced View**, fix the **Peer Name** (remove any `#`).
-4. Note the **Local tunnel network pool** (e.g. `10.2.0.0`) — change the last digit to `.1` (e.g. `10.2.0.1`) for use in the script.
+4. Note the **Local tunnel network pool** (e.g. `10.2.0.0`) — copy this down, and we'll change the last digit to `.1` (e.g. `10.2.0.1`) for use in the script.
 5. Apply and **enable** the tunnel.
 
 ### Step 3 – Attach Torrent Container to VPN Tunnel
 
 1. Go to **Docker > Edit** your torrent container.
 2. Set **Network Type** to `Custom: wg0` (or whatever your tunnel is named).
-3. In qBittorrent, go to **Settings > Connection**:
+3. In the qBittorrent webUI, go to **Settings > Connection**:
     - Disable: “Use UPnP / NAT-PMP”
     - Set port to `6881` (default, but configurable)
 
 ### Step 4 – Add the Script
 
-1. Install the **User Scripts** plugin (if not already).
+1. Install the **User Scripts** plugin from the unRAID Community Applications page (if not already installed).
 2. Go to **Plugins > User Scripts**.
-3. Add a new script (e.g., `proton_natpmp`).
+3. Add a new script (e.g., `vpn_torrent_forwarding`).
 4. Paste in the contents of **p2p-port-forward-script.sh**
 5. Modify these variables at the top of the script to match your setup:
 
@@ -72,7 +70,9 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Do
 ### Verifying that it's working
 
 1. Check the live output in your terminal:
+   
 ```tail -f /var/log/natpmp_forward.log```
 2. You should see a confirmation message, for example:
+   
 ```VPN port mapped successfully: 54321 to 6881```
 3. Within 5 minutes, your torrent client should acknowledged a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
