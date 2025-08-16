@@ -1,7 +1,7 @@
 # p2p-port-forward
 A lightweight shell script for unRAID that enables automatic NAT-PMP port forwarding in a Docker container running a torrent client (like qBittorrent) through a VPN connection — using unRAID's built-in WireGuard support.
 
-Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Docker containers required.
+Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other torrent clients as well. No Gluetun or custom VPN Docker containers required.
 
 ---
 
@@ -81,4 +81,4 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`. No Gluetun or custom VPN Do
     VPN port mapped successfully: 54321 to 6881
     ```
 
-4. Within 5 minutes, your torrent client should acknowledged a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
+4. Within 5 minutes, your torrent client should acknowledge a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
