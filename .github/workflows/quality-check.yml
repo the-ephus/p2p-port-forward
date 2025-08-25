@@ -1,0 +1,37 @@
+name: Code Quality Check
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install ShellCheck
+      run: sudo apt-get update && sudo apt-get install -y shellcheck
+    
+    - name: Run ShellCheck
+      run: shellcheck p2p-port-forward-script.sh
+    
+    - name: Check syntax
+      run: bash -n p2p-port-forward-script.sh
+
+  markdown-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install markdownlint
+      run: npm install -g markdownlint-cli
+    
+    - name: Check markdown files
+      run: markdownlint *.md || true  # Don't fail on markdown issues

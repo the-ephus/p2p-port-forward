@@ -1,0 +1,98 @@
+name: Bug Report
+description: Report a bug in the p2p-port-forward script
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below.
+
+  - type: input
+    id: unraid-version
+    attributes:
+      label: unRAID Version
+      description: What version of unRAID are you running?
+      placeholder: e.g., 6.12.4
+    validations:
+      required: true
+
+  - type: input
+    id: container-image
+    attributes:
+      label: Container Image
+      description: What torrent client container are you using?
+      placeholder: e.g., linuxserver/qbittorrent:latest
+    validations:
+      required: true
+
+  - type: input
+    id: vpn-provider
+    attributes:
+      label: VPN Provider
+      description: Which VPN provider are you using?
+      placeholder: e.g., ProtonVPN
+    validations:
+      required: true
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Script Configuration
+      description: Please share your script configuration (sanitize any sensitive info)
+      placeholder: |
+        CONTAINER="qbittorrent"
+        LISTENING_PORT="6881"
+        WGTUNNEL="10.2.0.1"
+        etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happens?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Please include relevant log output from /var/log/natpmp_forward.log
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Set up script with configuration X
+        2. Run script
+        3. Observe behavior Y
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues
+          required: true
+        - label: I have included relevant logs
+          required: true
+        - label: I have tested with the latest version
+          required: true

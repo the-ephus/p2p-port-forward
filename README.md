@@ -1,4 +1,7 @@
 # p2p-port-forward
+
+[![Code Quality Check](https://github.com/the-ephus/p2p-port-forward/actions/workflows/quality-check.yml/badge.svg)](https://github.com/the-ephus/p2p-port-forward/actions/workflows/quality-check.yml)
+
 A lightweight shell script for unRAID that enables automatic NAT-PMP port forwarding in a Docker container running a torrent client (like qBittorrent) through a VPN connection — using unRAID's built-in WireGuard support.
 
 Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other torrent clients as well. No Gluetun or custom VPN Docker containers required.
@@ -11,6 +14,9 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other 
 - Uses NAT-PMP (with `natpmpc`) to request forwarded ports from your VPN provider
 - Installs `libnatpmp` inside your container if missing
 - Minimal configuration required
+- Environment variable support for easy customization
+- Robust error handling and logging
+- Automatic log rotation
 
 ---
 
@@ -67,6 +73,19 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other 
 6. Save and set the script to run At Startup of Array.
 7. Reboot your array or run the script manually to test.
 
+### Alternative: Environment Variables
+
+You can also configure the script using environment variables:
+
+```bash
+export CONTAINER="transmission"
+export LISTENING_PORT="51413" 
+export WGTUNNEL="10.3.0.1"
+export LOGFILE="/tmp/natpmp_forward.log"
+export LOG_RETENTION_DAY="1"
+export INTERVAL="60"
+```
+
 ### Verifying that it's working
 
 1. Check the live output in your terminal:
@@ -75,10 +94,22 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other 
     tail -f /var/log/natpmp_forward.log
     ```
 
-3. You should see a confirmation message, for example:
+2. You should see a confirmation message, for example:
 
     ```
     VPN port mapped successfully: 54321 to 6881
     ```
 
-4. Within 5 minutes, your torrent client should acknowledge a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
+3. Within 5 minutes, your torrent client should acknowledge a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
+
+## Troubleshooting
+
+Having issues? Check out our [Troubleshooting Guide](TROUBLESHOOTING.md) for common solutions.
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## License
+
+This project is licensed under the GPL v3 License - see the [LICENSE](LICENSE) file for details.
