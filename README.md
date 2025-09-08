@@ -9,8 +9,7 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other 
 
 - Automatically maps rotating VPN P2P ports to your torrent client's listening port
 - Uses NAT-PMP (with `natpmpc`) to request forwarded ports from your VPN provider
-- Automatically installs NAT-PMP client (`natpmpc`) inside your container if missing
-- Tries multiple package sources and names for robust installation
+- Installs `libnatpmp` inside your container if missing
 - Minimal configuration required
 
 ---
@@ -83,25 +82,3 @@ Tested with ProtonVPN and `linuxserver/qbittorrent`, but should work with other 
     ```
 
 4. Within 5 minutes, your torrent client should acknowledge a fully connected client.  For example, qBittorrent will show an orange flame at the bottom for a firewalled connection. This should change to a green globe after the script runs successfully and the client updates.
-
----
-
-## Troubleshooting
-
-### NAT-PMP Installation Issues
-
-The script automatically installs the NAT-PMP client (`natpmpc`) if it's not found in your container. It tries multiple approaches:
-
-1. **Multiple package names**: `libnatpmp`, `natpmpc`, `libnatpmp-dev`, `natpmp`
-2. **Testing repository**: If main packages fail, it enables Alpine's testing repository
-3. **Verification**: Each installation is verified to ensure `natpmpc` command works
-
-If automatic installation fails, the script will provide manual installation instructions. You can also manually install by running:
-
-```bash
-docker exec your-container-name sh
-# Then try one of these:
-apk add libnatpmp
-# or compile from source:
-# https://github.com/miniupnp/libnatpmp
-```

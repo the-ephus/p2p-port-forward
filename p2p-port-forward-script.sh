@@ -25,55 +25,24 @@ if ! docker exec "$CONTAINER" which natpmpc &>/dev/null; then
     echo "natpmpc not found, installing in container '$CONTAINER'..." | tee -a "$LOGFILE"
     docker exec "$CONTAINER" apk update
     
-    # Try different package names and repositories for natpmpc
-    INSTALL_SUCCESS=false
-    
-    # First try common package names in main repository
-    for package in libnatpmp natpmpc libnatpmp-dev natpmp; do
-        echo "Trying to install package: $package" | tee -a "$LOGFILE"
-        if docker exec "$CONTAINER" apk add --no-cache "$package" 2>&1 | tee -a "$LOGFILE"; then
-            if docker exec "$CONTAINER" which natpmpc &>/dev/null; then
-                echo "Successfully installed natpmpc via package: $package" | tee -a "$LOGFILE"
-                INSTALL_SUCCESS=true
-                break
-            else
-                echo "Package $package installed but natpmpc still not found" | tee -a "$LOGFILE"
-                docker exec "$CONTAINER" apk del "$package" &>/dev/null
-            fi
-        else
-            echo "Package $package not available or failed to install" | tee -a "$LOGFILE"
-        fi
-    done
-    
-    # If main packages fail, try enabling testing repository
-    if [ "$INSTALL_SUCCESS" = false ]; then
-        echo "Trying testing repository..." | tee -a "$LOGFILE"
-        docker exec "$CONTAINER" sh -c 'echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories'
-        docker exec "$CONTAINER" apk update
+    # Try to install from Alpine repositories first
+    if ! docker exec "$CONTAINER" apk add --no-cache libnatpmp 2>&1 | tee -a "$LOGFILE"; then
+        echo "libnatpmp package not available, compiling from source..." | tee -a "$LOGFILE"
         
-        for package in libnatpmp natpmpc; do
-            echo "Trying to install from testing repo: $package" | tee -a "$LOGFILE"
-            if docker exec "$CONTAINER" apk add --no-cache "$package" 2>&1 | tee -a "$LOGFILE"; then
-                if docker exec "$CONTAINER" which natpmpc &>/dev/null; then
-                    echo "Successfully installed natpmpc from testing repo via package: $package" | tee -a "$LOGFILE"
-                    INSTALL_SUCCESS=true
-                    break
-                else
-                    echo "Package $package installed from testing but natpmpc still not found" | tee -a "$LOGFILE"
-                    docker exec "$CONTAINER" apk del "$package" &>/dev/null
-                fi
-            else
-                echo "Package $package not available in testing repository" | tee -a "$LOGFILE"
-            fi
-        done
-    fi
-    
-    # Final check and error if still not found
-    if [ "$INSTALL_SUCCESS" = false ]; then
-        echo "ERROR: Unable to install natpmpc. Please install it manually in the container." | tee -a "$LOGFILE"
-        echo "You can try: docker exec $CONTAINER sh" | tee -a "$LOGFILE"
-        echo "Then manually compile from source: https://github.com/miniupnp/libnatpmp" | tee -a "$LOGFILE"
-        exit 1
+        # Install build dependencies and compile from source
+        docker exec "$CONTAINER" apk add --no-cache gcc musl-dev make curl
+        docker exec "$CONTAINER" sh -c "cd /tmp && curl -L https://miniupnp.tuxfamily.org/files/libnatpmp-20230423.tar.gz | tar -xz"
+        docker exec "$CONTAINER" sh -c "cd /tmp/libnatpmp-20230423 && make && make install"
+        docker exec "$CONTAINER" sh -c "ldconfig /usr/local/lib"
+        
+        # Verify installation
+        if ! docker exec "$CONTAINER" which natpmpc &>/dev/null; then
+            echo "ERROR: Failed to install natpmpc. Exiting." | tee -a "$LOGFILE"
+            exit 1
+        fi
+        echo "Successfully compiled and installed natpmpc from source" | tee -a "$LOGFILE"
+    else
+        echo "Successfully installed libnatpmp package" | tee -a "$LOGFILE"
     fi
 fi
 
